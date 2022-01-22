@@ -71,3 +71,9 @@ impl Point {
         Point::new((pos % (self.x as u32 + 1)) as u16, (pos / (self.x as u32 + 1)) as u16)
     }
 }
+
+impl From<(u16, u16)> for Point {
+    fn from(xy: (u16, u16)) -> Point {
+        Point::new(xy.0, xy.1)
+    }
+}
