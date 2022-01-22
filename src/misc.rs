@@ -49,4 +49,25 @@ impl Point {
     pub fn order_around_x(&self, x: u16) -> u32 {
         self.x as u32 + self.y as u32 * x as u32
     }
+
+    /// Constructs a point based on its order in respect to this one.
+    /// 
+    /// This function finds a point such that `b.from_order(a.order(b)) == a`
+    /// iff `a.x <= b.x`. It also allows conversion from 1D to 2D, e.g. you can
+    /// use the ordering as the [`Vec`]'s index instead of using [`Point`]s as the
+    /// [`HashMap`](std::collections::HashMap)'s index.
+    /// 
+    /// # Example
+    /// ```rust
+    /// use gol::misc::Point;
+    /// 
+    /// // the 13th (counting from 0) point in respect to (4, 1) is (3, 2):
+    /// // (0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (0, 1), (1, 1), (2, 1),
+    /// // (3, 1), (4, 1), (0, 2), (1, 2), (2, 2), (3, 2), (4, 2), (0, 3)...
+    /// assert_eq!(Point::new(4, 1).from_order(13), Point::new(3, 2));
+    /// ```
+    #[inline]
+    pub fn from_order(&self, pos: u32) -> Self {
+        Point::new((pos % (self.x as u32 + 1)) as u16, (pos / (self.x as u32 + 1)) as u16)
+    }
 }
