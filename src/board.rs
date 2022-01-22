@@ -1,6 +1,7 @@
 use crate::misc;
 use bitvec::prelude::*;
 
+/// The board representation.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Board {
     size: misc::Point,
@@ -10,6 +11,11 @@ pub struct Board {
 }
 
 impl Board {
+    /// Constructs an empty board.
+    /// 
+    /// `size` says how big the board should be. `wrap` specifies if the board
+    /// should be wrapped infinitely, i.e. if a point out of bounds of the board
+    /// should be treated as it would be inside them.
     pub fn new(size: misc::Point, wrap: bool) -> Self {
         let mut bv = BitVec::new();
         // fill with false
@@ -20,6 +26,10 @@ impl Board {
         Self { size, data: bv, generation: 0, wrap }
     }
 
+    /// Sets the cell at a point.
+    /// 
+    /// # Panics
+    /// Panics if the point is out of obunds and the board is not wrapped.
     pub fn set(&mut self, p: misc::Point, value: bool) {
         if self.wrap {
             let wrapped = misc::Point::new(p.x % self.size.x, p.y % self.size.y);
@@ -29,6 +39,10 @@ impl Board {
         }
     }
 
+    /// Gets the value of the cell at a point.
+    /// 
+    /// If the point is out of bounds and the board is not wrapped, `false` is
+    /// returned. If it is, point modulo size is used instead.
     pub fn get(&self, p: misc::Point) -> bool {
         if self.wrap {
             let wrapped = misc::Point::new(p.x % self.size.x, p.y % self.size.y);
@@ -39,6 +53,15 @@ impl Board {
         }
     }
 
+    /// Returns a new generation of this board.
+    /// 
+    /// Neighbors of a cell are the eight cells around it. This method performs
+    /// a set of rules of Game of Life:
+    /// - live cells with fewer than two live neighbors die,
+    /// - live cells with more than three live neighors die,
+    /// - dead cells with exactly three neighbors become live cells.
+    /// 
+    /// It also increments the `generation` by one.
     pub fn next(&self) -> Board {
         let mut board = self.clone();
 
@@ -85,24 +108,31 @@ impl Board {
         board
     }
 
+    /// Moves this board on to the next generation.
+    /// 
+    /// See [`Self::next`].
     pub fn cont(&mut self) {
         self.data = self.next().data;
         self.generation += 1;
     }
 
+    /// Get size of the board.
     pub fn get_size(&self) -> misc::Point {
         self.size
     }
 
+    /// Returns the generation number.
     pub fn get_generation(&self) -> u64 {
         self.generation
     }
 
+    /// Returns `true` if the board is wrapped.
     pub fn is_wrapped(&self) -> bool {
         self.wrap
     }
 }
 
+/// Absolute subtraction: `|x - y|`
 fn abs_diff<T: std::ops::Sub<Output = T> + Ord>(x: T, y: T) -> T {
     if x < y { y - x }
     else { x - y }
