@@ -76,19 +76,19 @@ impl Board {
             if self.get(misc::Point::new(point.x + 1, point.y)) {
                 living_neighbors += 1
             }
-            if self.get(misc::Point::new(point.x + 1, abs_diff(point.y, 1))) {
+            if self.get(misc::Point::new(point.x + 1, wrap_diff(point.y, 1, self.size.y))) {
                 living_neighbors += 1
             }
-            if self.get(misc::Point::new(point.x, abs_diff(point.y, 1))) {
+            if self.get(misc::Point::new(point.x, wrap_diff(point.y, 1, self.size.y))) {
                 living_neighbors += 1
             }
-            if self.get(misc::Point::new(abs_diff(point.x, 1), abs_diff(point.y, 1))) {
+            if self.get(misc::Point::new(wrap_diff(point.x, 1, self.size.x), wrap_diff(point.y, 1, self.size.y))) {
                 living_neighbors += 1
             }
-            if self.get(misc::Point::new(abs_diff(point.x, 1), point.y)) {
+            if self.get(misc::Point::new(wrap_diff(point.x, 1, self.size.x), point.y)) {
                 living_neighbors += 1
             }
-            if self.get(misc::Point::new(abs_diff(point.x, 1), point.y + 1)) {
+            if self.get(misc::Point::new(wrap_diff(point.x, 1, self.size.x), point.y + 1)) {
                 living_neighbors += 1
             }
             if self.get(misc::Point::new(point.x, point.y + 1)) {
@@ -132,9 +132,9 @@ impl Board {
     }
 }
 
-/// Absolute subtraction: `|x - y|`
-fn abs_diff<T: std::ops::Sub<Output = T> + Ord>(x: T, y: T) -> T {
-    if x < y { y - x }
+/// Wrapped subtraction around `z`.
+fn wrap_diff<T: std::ops::Sub<Output = T> + Ord>(x: T, y: T, z: T) -> T {
+    if x < y { z - y - x }
     else { x - y }
 }
 
